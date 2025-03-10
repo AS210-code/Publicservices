@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="\nosql\templates\style.css">
+    <style>/* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        /* Form Container */
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        
+        /* Input Fields */
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        /* Buttons */
+        button {
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        button:hover {
+            background-color: #218838;
+        }
+        
+        /* Links */
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Dashboard */
+        .dashboard-container {
+            width: 90%;
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            text-align: center;
+        }
+        
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        ul li {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        </style>
+</head>
+<body>
+    <h2>Welcome, {{ current_user.username }}</h2>
+    <p>Your role: {{ current_user.role }}</p>
+  
+    <h3>Available Services</h3>
+    <ul id="services-list"></ul>
+  
+    <form id="apply-form" style="display:none;">
+      <label for="service">Select Service:</label>
+      <select id="service" name="service"></select>
+      <button type="submit">Apply</button>
+    </form>
+  
+    <a href="{{ url_for('logout') }}">Logout</a>
+    
+    <!-- Normal button styled link to redirect to another HTML page via Flask route -->
+    <a href="{{ url_for('index') }}" class="normal-button">Home</a>
+  
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>
