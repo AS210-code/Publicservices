@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>InfoSetu-Agriculture</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url('../static/agri.jpg');
+      background-size: cover;
+      margin: 0;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items:stretch;
+      color: rgb(255, 255, 255);
+    }
+    header {
+      background-color: rgba(134, 197, 130, 0.586);
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      color: rgb(240, 240, 241);
+      font-size: 1.8em;
+    }
+    
+    .home-button { margin-top: 10px;}
+    .home-button a { background-color: #1e23c0; color: white; padding: 8px 12px; text-decoration: none; border-radius: 5px;display: inline-block;transition: background-color 0.3s ease;}
+    .home-button a:hover { background-color: #88afe2; }
+    .container{ 
+        
+      background-color: rgba(27, 65, 18, 0.6); /* Increased content bg opacity */
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Add shadow */}
+    .search-bar { margin-bottom: 20px; display: flex; gap: 10px;}
+    .search-bar input[type="text"] { padding: 10px; border: 1px solid #ccc; border-radius: 4px;flex-grow: 1;font-size: 1em; }
+    .search-bar button { padding: 10px 15px; background-color: #007bff; color: rgb(254, 249, 249); border: none; border-radius: 4px; cursor: pointer;transition: background-color 0.3s ease; /* Smooth transition */ font-size: 1em;}
+    .search-bar button:hover { background-color: #0056b3; }
+    .search-results { margin-top: 15px; border: 1px ;background-color: #fcfcfc;color:#090909 ;padding: 10px; border-radius: 4px; display: none; }
+    .service-type { color: #fbf9f9; font-style: italic; margin-bottom: 15px;font-size: 1.1em;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        padding-bottom: 10px;
+    }
+    .search-results ul {
+        padding-left: 20px;
+        margin: 0;
+     }
+    .search-results li {
+        margin-bottom: 8px;
+        font-size: 0.95em;
+     }
+    .content {
+      padding: 20px;
+      
+    }
+    .content h2, .content h3 {
+        color: #000000; /* Light blue/cyan for headings */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        padding-bottom: 5px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+    .content ul {
+      list-style-type: none; /* Remove default bullet points */
+      padding-left: 0; /* Remove default padding */
+      margin-bottom: 20px; /* Add space below lists */
+    }
+    .content li {
+      margin-bottom: 8px; /* Space between buttons */
+    }
+    .content-button {
+      display: block; /* Make buttons take full width */
+      width: 100%;
+      padding: 10px 15px;
+      background-color: rgba(200, 227, 178, 0.242); /* Semi-transparent white */
+      color: #000000; /* White text */
+      border: 1px solid rgba(255, 255, 255, 0.4); /* Light border */
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: left; /* Align text to the left */
+      font-size: 1em; /* Match other text */
+      transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+      box-sizing: border-box; /* Include padding and border in width */
+    }
+    .content-button:hover {
+      background-color: rgba(255, 255, 255, 0.496); /* Lighter background on hover */
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+    /* Style for external links to indicate they open externally */
+    .content-button.external-link::after {
+        content: ' \2197'; /* Adds an arrow icon */
+        font-size: 0.8em;
+        vertical-align: super;
+    }
+  </style>
+ <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('search-input');
+      const searchButton = document.getElementById('search-button');
+      const searchResultsDiv = document.getElementById('search-results');
+      const contentArea = document.querySelector('.content').textContent.toLowerCase(); // Get text content once
+      
+      searchButton.addEventListener('click', function() {
+          const searchTerm = searchInput.value.trim().toLowerCase();
+          const content = document.body.textContent.toLowerCase();
+          searchResultsDiv.innerHTML = ''; // Clear previous results
+          searchResultsDiv.style.display = 'none'; // Hide initially
+         
+              if (!searchTerm) {
+                 searchResultsDiv.textContent = 'Please enter a search term.';
+                 searchResultsDiv.style.display = 'block';
+                  return;
+              }
+          
+          if (content.includes(searchTerm)) {
+              const matches = [];
+              // Basic keyword highlighting (can be improved)
+              let index = content.indexOf(searchTerm);
+              while (index !== -1 ) {
+                  matches.push(`...${content.substring(Math.max(0, index - 20), Math.min(content.length, index + searchTerm.length + 20))}...`);
+                  index = content.indexOf(searchTerm, index + 1);
+              }
+             
+              if (matches.length > 0 ) {
+                  const resultsList = document.createElement('ul');
+                  matches.forEach(match => {
+                      const li = document.createElement('li');
+                      li.textContent = match;
+                      resultsList.appendChild(li);
+                  });
+                  searchResultsDiv.appendChild(resultsList);
+                  searchResultsDiv.style.display = 'block';
+              } 
+              else {
+                  searchResultsDiv.textContent = 'No related content found.';
+                  searchResultsDiv.style.display = 'block';
+              }
+          } else {
+              searchResultsDiv.textContent = 'No related content found.';
+              searchResultsDiv.style.display = 'block';
+          }
+      });
+  });
+</script>
+</head>
+<body>
+  <header>
+    <h1>Agriculture Services</h1>
+    <div class="home-button">
+    <a href="{{ url_for('home') }}">Home</a>
+
+  </div>
+  </header>
+  <div class="container">
+  <div class="content">
+    <p class="service-type">Type of Service: Public Agricultural Information and Resources</p>
+
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search agriculture data...">
+            <button id="search-button">Search</button>
+           
+        </div>
+        <div id="search-results" class="search-results"></div>
+
+        <h2>Key Areas</h2>
+        <ul>
+            <li><button class="content-button" onclick="window.open('https://www.google.com/search?q=CropProductionStatisticsofIndia', '_blank')">Crop Production Statistics</button></li>
+            <li><button class="content-button" onclick="window.open('https://www.google.com/search?q=SoilHealthDataofIndia', '_blank')">Soil Health Data</button></li>
+            <li><button class="content-button" onclick="window.open('https://www.google.com/search?q=IndianIrrigationInformation', '_blank')">Irrigation Information</button></li>
+            <li><button class="content-button" onclick="window.open('https://www.google.com/search?q=MarketPricesofAgriculturalProductsinIndia', '_blank')">Market Prices of Agricultural Products</button></li>
+            <li><button class="content-button" onclick="window.open('https://www.google.com/search?q=indianGovernmentSchemesforFarmers', '_blank')">Government Schemes for Farmers</button></li>
+        </ul>
+        
+        <h2>Available Agriculture Services</h2>
+        <ul>
+            <li><button class="content-button external-link" onclick="window.location.href='https://soilhealth.dac.gov.in/soil-health-dashboard'">Soil Health Cards</button></li>
+            <li><button class="content-button external-link" onclick="window.location.href='https://shorturl.at/R8WHG'">Government Schemes/Missions on farming and agriculture</button></li>
+            <li><button class="content-button external-link" onclick="window.location.href='https://shorturl.at/ySbf8t'">Water Bodies Census</button></li>
+            <li><button class="content-button external-link" onclick="window.location.href='https://rkvy.da.gov.in/'">Rashtriya Krishi Vikas Yojana (RKVY)</button></li>
+        </ul>
+        
+        <h2>Research & Articles</h2>
+        <p>Explore research on the Indian Agricultural System:</p>
+        <ul>
+            <li><button class="content-button external-link" onclick="window.open('https://shorturl.at/c02Yh', '_blank')">Climate Change and Indian Agriculture</button></li>
+            <li><button class="content-button external-link" onclick="window.open('https://shorturl.at/OKNZW', '_blank')">Advances in Precision Farming Techniques</button></li>
+            <li><button class="content-button external-link" onclick="window.open('https://www.researchgate.net/publication/374331009_Organic_Farming_in_India_Evolution_Current_Status_and_Policy_Perspectives#:~:text=India%20has%201.59%20million%20organic,aspects%20of%20farming%20and%20economy.', '_blank')">Organic Farming in India</button></li>
+            <li><button class="content-button external-link" onclick="window.open('https://www.worldwidejournals.com/indian-journal-of-applied-research-(IJAR)/article/agriculture-and-food-security-in-india-an-econonmic-analysis/NTQ4NA==/?is=1', '_blank')">Agriculture and Food Security in India</button></li>
+            <li><button class="content-button external-link" onclick="window.open('https://bckv.edu.in/images/pdf/1513771398agricultural%20research.pdf', '_blank')">Agriculture Research in India</button></li>
+        </ul>
+  </div>
+</div>
+</body>
+</html>

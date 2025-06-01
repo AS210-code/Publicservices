@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('image.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #f0f8ff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .signup-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 300px;
+        }
+        h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input[type="text"], input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+        button {
+            background-color:#007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .login-link {
+            margin-top: 15px;
+            color: #555;
+        }
+        .login-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .flash-message {
+            margin-bottom: 15px;
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const signupForm   = document.getElementById('signup-form');
+    const flashMessage = document.getElementById('flash-message');
+
+    signupForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      // grab all fields, including the new "name"
+      const name     = document.getElementById('name').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const role     = document.getElementById('role').value;
+
+      if (!name || !username || !password || !role) {
+        flashMessage.textContent = 'All fields are required.';
+        flashMessage.style.color = 'red';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, username, password, role })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          flashMessage.textContent = result.message;
+          flashMessage.style.color = 'green';
+          // after signup, redirect to login (you can pass username via querystring if you like)
+          setTimeout(() => {
+            window.location.href =  "{{ url_for('login') }}";
+          }, 1500);
+        } else {
+          flashMessage.textContent = result.message || 'Signup failed.';
+          flashMessage.style.color = 'red';
+        }
+
+      } catch (error) {
+        console.error('Signup error:', error);
+        flashMessage.textContent = 'An error occurred. Please try again.';
+        flashMessage.style.color = 'red';
+      }
+    });
+  });
+</script>
+
+</head>
+<body>
+    <div class="signup-container">
+        <h2>Sign Up</h2>
+       <form id="signup-form">
+  <input type="text" id="name"     placeholder="Full Name" required />
+  <input type="text" id="username" placeholder="Username"  required />
+  <input type="password" id="password" placeholder="Password" required />
+  <select id="role" required>
+    <option value="" disabled selected>Select role</option>
+    <option value="user">User</option>
+    <option value="admin">Admin</option>
+  </select>
+  <button type="submit">Sign Up</button>
+</form>
+
+        </form>
+        <p id="flash-message" class="flash-message"></p>
+        <p class="login-link">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+    </div>
+</body>
+</html>

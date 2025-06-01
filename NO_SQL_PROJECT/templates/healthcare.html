@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>InfoSetu-Healthcare</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url('../static/med.jpg');
+      background-size: cover;
+      background-position: center;
+      margin: 0;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items:stretch;
+    }
+    header {
+      background-color:  rgba(237, 181, 141, 0.519);
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      color: rgb(31, 31, 167);
+      font-size: 1.8em;
+    }
+    .home-button { margin-top: 10px;}
+    .home-button a { background-color: #1e23c0; color: white; padding: 8px 12px; text-decoration: none; border-radius: 5px;display: inline-block;transition: background-color 0.3s ease;}
+    .home-button a:hover { background-color: #88afe2; }
+    .container{ 
+        
+        background-color:  rgba(25, 29, 37, 0.6); /* Increased content bg opacity */
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Add shadow */}
+    .search-bar { margin-bottom: 20px; display: flex; gap: 10px;}
+    .search-bar input[type="text"] { padding: 10px; border: 1px solid #ccc; border-radius: 4px;flex-grow: 1;font-size: 1em; }
+    .search-bar button { padding: 10px 15px; background-color: #007bff; color: rgb(254, 249, 249); border: none; border-radius: 4px; cursor: pointer;transition: background-color 0.3s ease; /* Smooth transition */ font-size: 1em;}
+    .search-bar button:hover { background-color: #0056b3; }
+    .search-results { margin-top: 15px; border: 1px ;background-color: #fcfcfc;color:#090909 ;padding: 10px; border-radius: 4px; display: none; }
+    .service-type { color: #fbf9f9; font-style: italic; margin-bottom: 15px;font-size: 1.1em;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        padding-bottom: 10px;
+    }
+    .search-results ul {
+        padding-left: 20px;
+        margin: 0;
+     }
+     .search-results li {
+        margin-bottom: 8px;
+        font-size: 0.95em;
+     }
+
+    /* Styling for headings within content */
+    .content h2 {
+        color: #000000; /* Light blue/cyan for headings */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        padding-bottom: 5px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+
+    /* --- Styling for the new content buttons --- */
+    .content ul {
+      list-style-type: none; /* Remove default bullet points */
+      padding-left: 0; /* Remove default padding */
+      margin-bottom: 20px; /* Add space below lists */
+    }
+    .content li {
+      margin-bottom: 8px; /* Space between buttons */
+    }
+    .content-button {
+      display: block; /* Make buttons take full width */
+      width: 100%;
+      padding: 10px 15px;
+      background-color: rgba(255, 255, 255, 0.15); /* Semi-transparent white */
+      color: #ffffff; /* White text */
+      border: 1px solid rgba(255, 255, 255, 0.4); /* Light border */
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: left; /* Align text to the left */
+      font-size: 1em; /* Match other text */
+      transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+      box-sizing: border-box; /* Include padding and border in width */
+    }
+    .content-button:hover {
+      background-color: rgba(43, 26, 26, 0.3); /* Lighter background on hover */
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+    /* Style for external links to indicate they open externally */
+    .content-button.external-link::after {
+        content: ' \2197'; /* Adds an arrow icon */
+        font-size: 0.8em;
+        vertical-align: super;
+    }
+
+  </style>
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput      = document.getElementById('search-input');
+      const searchButton     = document.getElementById('search-button');
+      const resultsContainer = document.getElementById('search-results');
+      const allButtons       = Array.from(document.querySelectorAll('.content-button'));
+
+      // build an array of { label, url, target }
+      const items = allButtons.map(btn => ({
+        label: btn.textContent.trim(),
+        url:   btn.dataset.url || '#',
+        target: btn.dataset.target || '_self'
+      }));
+
+      // debounced search
+      let debounceTimer;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(doSearch, 250);
+      });
+
+      searchButton.addEventListener('click', doSearch);
+      searchInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          doSearch();
+        }
+      });
+
+      function doSearch() {
+        const term = searchInput.value.trim().toLowerCase();
+        resultsContainer.innerHTML = '';
+        resultsContainer.style.display = 'none';
+
+        if (!term) {
+          showMessage('Please enter a search term.');
+          return;
+        }
+
+        const matches = items.filter(i =>
+          i.label.toLowerCase().includes(term)
+        );
+
+        if (!matches.length) {
+          showMessage(`No results for “${term}”.`);
+          return;
+        }
+
+        const ul = document.createElement('ul');
+        matches.forEach(({ label, url, target }) => {
+          const li = document.createElement('li');
+          const a  = document.createElement('a');
+          a.textContent = label;
+          a.href        = url;
+          a.target      = target;
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        resultsContainer.appendChild(ul);
+        resultsContainer.style.display = 'block';
+      }
+
+      function showMessage(msg) {
+        resultsContainer.textContent = msg;
+        resultsContainer.style.display = 'block';
+      }
+    });
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Healthcare Services</h1>
+    <div class="home-button">
+    <a href="{{ url_for('home') }}">Home</a>
+
+  </div>
+  </header>
+  <div class="container">
+  <div class="content">
+    <p class="service-type">Type of Service: Public Health and Medical Services</p>
+
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search healthcare data...">
+        <button id="search-button">Search</button>
+        
+    </div>
+    <div id="search-results" class="search-results"></div>
+    <h2>Key Areas</h2>
+<ul>
+    <li><button class="content-button" onclick="window.open('https://www.google.com/search?q=IndianState/UTwiseHospitalBedAvailability', '_blank')">State/UT wise Hospital Bed Availability</button></li>
+    <li><button class="content-button" onclick="window.open('https://www.google.com/search?q=DiseasePrevalenceStatisticsofIndia', '_blank')">Disease Prevalence Statistics</button></li>
+    <li><button class="content-button" onclick="window.open('https://www.google.com/search?q=InfantMortalityRatesofIndia', '_blank')">Infant Mortality Rates</button></li>
+    <li><button class="content-button" onclick="window.open('https://www.google.com/search?q=HealthcareDynamicsofIndia', '_blank')">Healthcare Dynamics of India</button></li>
+    <li><button class="content-button" onclick="window.open('https://www.google.com/search?q=IndianGovernmentHealthPrograms', '_blank')">Government Health Programs</button></li>
+</ul>
+<h2>Available Healthcare Services</h2>
+<ul>
+    <li><button class="content-button external-link" onclick="window.location.href='https://abdm.gov.in/'">Ayushman Bharat scheme details</button></li>
+    <li><button class="content-button external-link" onclick="window.location.href='https://covidtracking.in/'">COVID-19 Tracking India</button></li>
+    <li><button class="content-button external-link" onclick="window.location.href='https://shorturl.at/54bxY'">Government and private hospital listings</button></li>
+    <li><button class="content-button external-link" onclick="window.location.href='https://shorturl.at/9NYxd'">Telemedicine and e-health services</button></li>
+</ul>
+<h2>Research & Articles</h2>
+<p>Explore research on the Indian Healthcare System:</p>
+<ul>
+    <li><button class="content-button external-link" onclick="window.open('https://shorturl.at/5bNlv', '_blank')">Study on the Impact of Universal Healthcare</button></li>
+    <li><button class="content-button external-link" onclick="window.open('https://shorturl.at/VQ1iR', '_blank')">Advancements in Telemedicine</button></li>
+    <li><button class="content-button external-link" onclick="window.open('https://shorturl.at/7oDsv', '_blank')">Research on Mental Health Problems in India</button></li>
+    <li><button class="content-button external-link" onclick="window.open('https://cijmr.com/index.php/cijmr', '_blank')">Central India Journal of Medical Research</button></li>
+    <li><button class="content-button external-link" onclick="window.open('https://www.thelancet.com/', '_blank')">The Lancet Healthcare Research</button></li>
+</ul>
+  </div>
+</div>
+</body>
+</html>

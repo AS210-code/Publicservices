@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('image.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #f0f8ff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 300px;
+        }
+        h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input[type="text"], input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error-message {
+            color: red;
+            margin-bottom: 10px;
+        }
+        .success-message {
+            color: green;
+            margin-bottom: 10px;
+        }
+        .signup-link {
+            margin-top: 15px;
+            color: #555;
+        }
+        .signup-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+ <body>
+  <div class="login-container">
+    <h2>Log In</h2>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <button type="submit">Sign In</button>
+    </form>
+    <p id="error-message"></p>
+    <p class="signup-link">
+      Not created an account? <a href="{{ url_for('signup') }}">Sign up</a>
+    </p>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('login-form');
+    const msg  = document.getElementById('error-message');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const username = form.username.value;
+      const password = form.password.value;
+
+      const res = await fetch('{{ url_for("login") }}', {
+        method:  'POST',
+        headers: {'Content-Type':'application/json'},
+        body:    JSON.stringify({ username, password })
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        msg.className = 'success-message';
+        msg.textContent = 'Login successful! Redirecting…';
+        // use the URL Flask provided
+        setTimeout(() => {
+          window.location.href = result.redirect;
+        }, 1000);
+      } else {
+        msg.className = 'error-message';
+        msg.textContent = result.message || 'Invalid credentials.';
+      }
+    });
+  });
+  </script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>InfoSetu</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+      background-image:  url("{{ url_for('static', filename='image.jpg') }}");
+      background-size: cover;
+      background-position: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .top-navigation {
+      text-align: left;
+    }
+    .top-navigation a {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .top-navigation a:hover {
+      background-color: #0056b3;
+    }
+    .dashboard-section {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      color: #333;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+    }
+    .history-list, .saved-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .history-item, .saved-item {
+      margin-bottom: 10px;
+      padding: 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+    }
+    .calendar-container {
+      margin-top: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      background-color: #f9f9f9;
+    }
+    .calendar {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .calendar th, .calendar td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    .calendar th {
+      background-color: #f0f0f0;
+    }
+    .used-day {
+      background-color: #c3e6cb !important;
+      color: #155724;
+    }
+    .time-spent { margin-top: 10px; }
+    .time-spent p { margin-bottom: 5px; }
+    .add-feature { border: 1px dashed #ccc; background-color: #f9f9f9; }
+    .add-feature h3 { color: #555; }
+    canvas { width: 100%; height: 300px; }
+    a { color: #007bff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const role = "{{ role }}";
+
+    if (role !== 'admin') {
+      // USER or GUEST Mode
+      const calendarDiv = document.getElementById('calendar');
+      const today = new Date();
+      const month = today.getMonth();
+      const year = today.getFullYear();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDayOfMonth = new Date(year, month, 1).getDay();
+      const monthNames = ["January", "February", "March", "April", "May", "June",
+                          "July", "August", "September", "October", "November", "December"];
+
+      let calendarHTML = `<h3>${monthNames[month]} ${year}</h3><table class="calendar"><tr>`;
+      const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      daysOfWeek.forEach(day => calendarHTML += `<th>${day}</th>`);
+      calendarHTML += `</tr><tr>`;
+
+      for (let i = 0; i < firstDayOfMonth; i++) calendarHTML += `<td></td>`;
+
+      const usageDays = new Set();
+      for (let i = 0; i < Math.floor(Math.random() * 15) + 5; i++) {
+        usageDays.add(Math.floor(Math.random() * daysInMonth) + 1);
+      }
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        const isUsed = usageDays.has(i);
+        calendarHTML += `<td class="${isUsed ? 'used-day' : ''}">${i}</td>`;
+        if ((i + firstDayOfMonth) % 7 === 0 && i !== daysInMonth) {
+          calendarHTML += `</tr><tr>`;
+        }
+      }
+      calendarHTML += `</tr></table>`;
+      calendarDiv.innerHTML = calendarHTML;
+
+      const historyList = document.getElementById('search-history');
+      const savedList = document.getElementById('saved-pages');
+      const dummyHistory = ["Analyzed 'renewable energy policies'", "Viewed 'historical monuments data'", "Searched 'water resource management'"];
+      const dummySaved = ["Energy Policy Reports", "Cultural Heritage Sites", "Water Management Articles"];
+
+      dummyHistory.forEach(item => {
+        const li = document.createElement('li');
+        li.classList.add('history-item');
+        li.textContent = item;
+        historyList.appendChild(li);
+      });
+
+      dummySaved.forEach(item => {
+        const li = document.createElement('li');
+        li.classList.add('saved-item');
+        li.textContent = item;
+        savedList.appendChild(li);
+      });
+
+      const timeToday = Math.floor(Math.random() * 75) + 15;
+      const timeMonth = Math.floor(Math.random() * 750) + 150;
+      document.getElementById('time-today').textContent = `${timeToday} minutes`;
+      document.getElementById('time-month').textContent = `${timeMonth} minutes`;
+
+    } else {
+      // ADMIN Mode
+      document.getElementById('admin-usage').style.display = 'block';
+      document.getElementById('admin-updates-section').style.display = 'block';
+      // const ctx = document.getElementById('usage-chart').getContext('2d');
+      const ctx = document.getElementById('usage-chart');
+  if (ctx) {
+    const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const data = labels.map(() => Math.floor(Math.random() * 100)); // random data 0–99
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'User Activity',
+          data: data,
+          fill: false,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true },
+          title: {
+            display: true,
+            text: 'Weekly Website Usage'
+          }
+        }
+      }
+    });
+  }
+      // new Chart(ctx, {
+      //   type: 'line',
+      //   data: {
+      //     labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+      //     datasets: [{
+      //       label: 'Total User Minutes',
+      //       data: [320, 450, 390, 510],
+      //       borderColor: 'rgba(75, 192, 192, 1)',
+      //       fill: true,
+      //       tension: 0.3,
+      //     }]
+      //   },
+      //   options: {
+      //     responsive: true,
+      //     plugins: {
+      //       legend: { position: 'top' },
+      //       title: { display: true, text: 'Website Usage by Users' }
+      //     }
+      //   }
+      // });
+
+      const changes = ['Updated search filter on Apr 18', 'Added new data category on Apr 15'];
+      const updateList = document.getElementById('admin-updates');
+      changes.forEach(change => {
+        const li = document.createElement('li');
+        li.textContent = change;
+        updateList.appendChild(li);
+      });
+    }
+  });
+</script>
+
+</head>
+<body>
+  <div class="container">
+    <div class="top-navigation">
+     <a href="{{ url_for('home') }}">Home</a>
+
+    </div>
+    <!-- USER SECTIONS -->
+{% if role == 'user' %}
+<div class="dashboard-section" id="user-history">
+  <h2>Search History</h2>
+  <ul id="search-history" class="history-list"></ul>
+</div>
+
+<div class="dashboard-section" id="user-saved">
+  <h2>Saved Pages/Searches</h2>
+  <ul id="saved-pages" class="saved-list"></ul>
+</div>
+
+<div class="dashboard-section" id="user-usage">
+  <h2>Website Usage</h2>
+  <div class="calendar-container">
+    <div id="calendar"></div>
+    <div class="time-spent">
+      <p>Time spent today: <span id="time-today"></span></p>
+      <p>Time spent this month: <span id="time-month"></span></p>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ADMIN SECTIONS -->
+{% if role == 'admin' %}
+<div class="dashboard-section" id="admin-usage">
+  <h2>Website Usage by Users</h2>
+  <canvas id="usage-chart"></canvas>
+</div>
+
+<div class="dashboard-section" id="admin-updates-section">
+  <h2>Recent Admin Changes</h2>
+  <ul id="admin-updates"></ul>
+</div>
+{% endif %}
+
+    <!-- USER SECTIONS -->
+    <!-- <div class="dashboard-section" id="user-history">
+      <h2>Search History</h2>
+      <ul id="search-history" class="history-list"></ul>
+    </div>
+
+    <div class="dashboard-section" id="user-saved">
+      <h2>Saved Pages/Searches</h2>
+      <ul id="saved-pages" class="saved-list"></ul>
+    </div>
+
+    <div class="dashboard-section" id="user-usage">
+      <h2>Website Usage</h2>
+      <div class="calendar-container">
+        <div id="calendar"></div>
+        <div class="time-spent">
+          <p>Time spent today: <span id="time-today"></span></p>
+          <p>Time spent this month: <span id="time-month"></span></p>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- ADMIN SECTIONS -->
+    <!-- <div class="dashboard-section" id="admin-usage" style="display: none;">
+      <h2>Website Usage by Users</h2>
+      <canvas id="usage-chart"></canvas>
+    </div>
+
+    <div class="dashboard-section" id="admin-updates-section" style="display: none;">
+      <h2>Recent Admin Changes</h2>
+      <ul id="admin-updates"></ul>
+    </div> -->
+  </div>
+</body>
+</html>
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfoSetu</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4;background-image: url('image.jpg');
+            background-size: cover;
+            background-position: center; }
+        .container { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 20px; } /* Use grid for layout */
+        .top-navigation { text-align: left; }
+        .top-navigation a { background-color: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; }
+        .top-navigation a:hover { background-color: #0056b3; }
+        .dashboard-section { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); } /* Common styling for sections */
+        h2 { color: #333; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .history-list, .saved-list { list-style: none; padding-left: 0; }
+        .history-item, .saved-item { margin-bottom: 10px; padding: 8px; background-color: #e9ecef; border-radius: 4px; }
+        .calendar-container {margin-top: 15px; border: 1px solid #ddd; border-radius: 5px; padding: 15px; background-color: #f9f9f9; } /* No specific container styles needed now */
+        .calendar { border-collapse: collapse; width: 100%; }
+        .calendar th, .calendar td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        .calendar th { background-color: #f0f0f0; }
+        .used-day { background-color: #c3e6cb !important; color: #155724; } /* Style for used days */
+        .time-spent { margin-top: 10px; }
+        .time-spent p { margin-bottom: 5px; }
+        .add-feature { border: 1px dashed #ccc; background-color: #f9f9f9; }
+        .add-feature h3 { color: #555; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Basic calendar display with usage highlighting
+            const calendarDiv = document.getElementById('calendar');
+            const today = new Date();
+            const month = today.getMonth();
+            const year = today.getFullYear();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            let calendarHTML = `<h3>${monthNames[month]} ${year}</h3><table class="calendar"><tr>`;
+            const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            daysOfWeek.forEach(day => calendarHTML += `<th>${day}</th>`);
+            calendarHTML += `</tr><tr>`;
+
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                calendarHTML += `<td></td>`;
+            }
+
+            // Simulate website usage days (replace with actual data)
+            const usageDays = new Set();
+            for (let i = 0; i < Math.floor(Math.random() * 15) + 5; i++) { // Random number of usage days
+                usageDays.add(Math.floor(Math.random() * daysInMonth) + 1);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const currentDate = new Date(year, month, i);
+                const dayOfWeek = currentDate.getDay();
+                const isUsed = usageDays.has(i);
+                calendarHTML += `<td class="${isUsed ? 'used-day' : ''}">${i}</td>`;
+                if ((i + firstDayOfMonth) % 7 === 0 && i !== daysInMonth) {
+                    calendarHTML += `</tr><tr>`;
+                }
+            }
+
+            while ((calendarHTML.match(/<td><\/td>/g) || []).length < 7 - (firstDayOfMonth + daysInMonth) % 7 && (firstDayOfMonth + daysInMonth) % 7 !== 0) {
+                calendarHTML += `<td></td>`;
+            }
+
+            calendarHTML += `</tr></table>`;
+            calendarDiv.innerHTML = calendarHTML;
+
+            // Dummy data for history and saved items
+            const historyList = document.getElementById('search-history');
+            const savedList = document.getElementById('saved-pages');
+            const dummyHistory = ["Analyzed 'renewable energy policies'", "Viewed 'historical monuments data'", "Searched 'water resource management'"];
+            const dummySaved = ["Energy Policy Reports", "Cultural Heritage Sites", "Water Management Articles"];
+
+            dummyHistory.forEach(item => {
+                const li = document.createElement('li');
+                li.classList.add('history-item');
+                li.textContent = item;
+                historyList.appendChild(li);
+            });
+
+            dummySaved.forEach(item => {
+                const li = document.createElement('li');
+                li.classList.add('saved-item');
+                li.textContent = item;
+                savedList.appendChild(li);
+            });
+
+            // Dummy data for time spent
+            const timeToday = Math.floor(Math.random() * 75) + 15;
+            const timeMonth = Math.floor(Math.random() * 750) + 150;
+            document.getElementById('time-today').textContent = `${timeToday} minutes`;
+            document.getElementById('time-month').textContent = `${timeMonth} minutes`;
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="top-navigation">
+            <a href="index.html">Home</a>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Search History</h2>
+            <ul id="search-history" class="history-list">
+                </ul>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Saved Pages/Searches</h2>
+            <ul id="saved-pages" class="saved-list">
+                </ul>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Website Usage</h2>
+            <div class="calendar-container">
+                <div id="calendar">
+                    </div>
+                <div class="time-spent">
+                    <p>Time spent today: <span id="time-today"></span></p>
+                    <p>Time spent this month: <span id="time-month"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section add-feature">
+            <h3>Future Features (Admin Management)</h3>
+            <p>This section highlights potential features that administrators can add to the platform.</p>
+            <ul>
+                <li>Personalized Data Recommendations</li>
+                <li>Community Forums for Data Discussion</li>
+                <li>API Access for Developers</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
+ -->
