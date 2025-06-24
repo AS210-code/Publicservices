@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 
 # Connect to your MongoDB cluster
-client = MongoClient("mongodb+srv://ankitasahariamld:NjK4BOByzwpC7jrS@cluster0.zzexl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+client = MongoClient("your_cluster_key")
 
 # Choose the database
 db = client["myDatabase"]
