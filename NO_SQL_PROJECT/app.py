@@ -14,7 +14,7 @@ CORS(app)
 
 # MongoDB setup
 client = MongoClient(
-   "mongodb+srv://ankitasahariamld:NjK4BOByzwpC7jrS@cluster0.zzexl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+   "your_cluster_key"
 )
 db = client["infosetu"]
 users_collection   = db.users
